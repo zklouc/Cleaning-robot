@@ -1,0 +1,115 @@
+*** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\Keil5\MDK\ARM\ARMCC\Bin'
+Build target 'Main_Ctrl'
+compiling main.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+../Core/Src/main.c: 2 warnings, 0 errors
+compiling stm32f4xx_it.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+../Core/Src/stm32f4xx_it.c: 2 warnings, 0 errors
+compiling freertos.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+../Core/Src/freertos.c: 2 warnings, 0 errors
+compiling ROV_Pressure_Sensor.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\ROV_Pressure_Sensor.c(142): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  						ROV_Press.Conv_speed[0] = (float)(ROV_Press.Conv_depth[0] - ROV_Press.Conv_depth[1])*(1.0-lpt_k) + ROV_Press.Conv_speed[1]*lpt_k;  //单位 mm/s
+..\Users\Modules\ROV_Pressure_Sensor.c: 3 warnings, 0 errors
+compiling Module_UART.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_UART.c: 2 warnings, 0 errors
+compiling Module_LED.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_LED.c: 2 warnings, 0 errors
+compiling Module_Prop.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_Prop.c(172): warning:  #1-D: last line of file ends without a newline
+  }
+..\Users\Modules\Module_Prop.c: 3 warnings, 0 errors
+compiling Error_Handle.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Error_Handle.c: 2 warnings, 0 errors
+compiling ROV_AirPressure_Sensor.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\ROV_AirPressure_Sensor.c: 2 warnings, 0 errors
+compiling Module_Encoder.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_Encoder.c(9): warning:  #177-D: variable "CMD1_RESET_ZERO"  was declared but never referenced
+  static const uint8_t CMD1_RESET_ZERO[8]  = {0x01, 0x06, 0x00, 0x08, 0x00, 0x01, 0xC9, 0xC8};
+..\Users\Modules\Module_Encoder.c(10): warning:  #177-D: variable "CMD2_RESET_ZERO"  was declared but never referenced
+  static const uint8_t CMD2_RESET_ZERO[8]  = {0x02, 0x06, 0x00, 0x08, 0x00, 0x01, 0xC9, 0xFB};
+..\Users\Modules\Module_Encoder.c: 4 warnings, 0 errors
+compiling Module_485_Prop.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_485_Prop.c: 2 warnings, 0 errors
+compiling Module_PID.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_PID.c(202): warning:  #185-D: dynamic initialization in unreachable code
+  		int16_t auto_cq = 0;
+..\Users\Modules\Module_PID.c(200): warning:  #546-D: transfer of control bypasses initialization of:
+            variable "auto_cq"  (declared at line 202)
+  	switch(PID_Type->symbol)
+  	^
+..\Users\Modules\Module_PID.c: 4 warnings, 0 errors
+compiling MainCommunicate.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\MainCommunicate.c(123): warning:  #550-D: variable "xLastWakeTime"  was set but never used
+  	static TickType_t xLastWakeTime;
+..\Users\Modules\MainCommunicate.c: 3 warnings, 0 errors
+compiling Module_CAN_Prop.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+..\Users\Modules\Module_CAN_Prop.c: 3 warnings, 0 errors
+compiling Module_Compass.c...
+../Users/Modules/Module_CAN_Prop.h(14): warning:  #9-D: nested comment is not allowed
+  /* CAN发送扩展帧起始地址 */
+../Users/Libs/sht_iic_hal.h(87): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Users\Modules\Module_Compass.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=39404 RO-data=1552 RW-data=2036 ZI-data=22452  
+FromELF: creating hex file...
+"Main_Ctrl\Main_Ctrl.axf" - 0 Error(s), 38 Warning(s).
+Build Time Elapsed:  00:00:21
