@@ -273,8 +273,8 @@ void MX_FREERTOS_Init(void) {
   /* creation of Manual_V_Task */
   Manual_V_TaskHandle = osThreadNew(Manual_V_Ctrl, NULL, &Manual_V_Task_attributes);
 
-/* creation of Manual_H_Task */
-  Manual_H_TaskHandle = osThreadNew(Manual_H_Ctrl, NULL, &Manual_H_Task_attributes);
+///* creation of Manual_H_Task */
+//  Manual_H_TaskHandle = osThreadNew(Manual_H_Ctrl, NULL, &Manual_H_Task_attributes);
 
 //  /* creation of Auto_V_Task */
 //  Auto_V_TaskHandle = osThreadNew(Auto_V_Ctrl, NULL, &Auto_V_Task_attributes);
@@ -352,6 +352,8 @@ void Global_Init(void *argument)
 	HAL_Delay(10);
 	hSHT30.error |= SHT3X_ReadStatus(&hSHT30.status.u16);
 	hSHT30.error = SHT3X_StartPeriodicMeasurment(REPEATAB_HIGH, FREQUENCY_4HZ);
+	
+	Prop_Init();
 	
 	/* 推进器初始化 */
 	CAN_Prop_Init();
@@ -445,20 +447,15 @@ void Standby_Callback(void *argument)
 		}
 		
 		/* 上浮下潜控制量 */
-		Prop_Infor.Vertical_Value = 1500;
-		
+		Prop_Ctrol.Vertical_Value_DEC =0x80;
+		Prop_Ctrol.Vertical_Value_ADD =0x80 ;
 		/* 灯亮度控制量 */
 		for (uint8_t i = 0; i < LED_Device_Num; i++)
 		{
 			LED.CQ_Current[i] = 0;
 		}
 		
-		/* 推进器控制模式 */
-//		Motor_Kind[Vertical].Enable_Flag = 0;
-//		Motor_Kind[Horizontal].Enable_Flag = 0;
-//		Motor_Kind[Vertical].Gear = 0;
-//		Motor_Kind[Horizontal].Gear = 0;
-//		Prop_Infor.Roll_Flag = false;
+		Prop_Init();
 	}
 		
   /* USER CODE END Standby_Callback */

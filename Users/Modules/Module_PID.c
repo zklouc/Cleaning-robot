@@ -120,7 +120,7 @@ void AutoCtrl(AutoCtrl_StateTypeDef *PID_Type)
 	switch(PID_Type->symbol)
 	{
 		case Auto_Depth:
-			PID_Type->set_value = 0.2f + (float)(Prop_Infor.Vertical_Value - 1000) * 0.02f;
+			PID_Type->set_value = 0.2f + (float)(Prop_Ctrol.Vertical_Value_ADD - 1000) * 0.02f;
 //			PID_Type->act_value = (float)WaterData.Conv_Depth[0] * 0.01f;
 			break;
 		case Auto_Heading:
@@ -204,7 +204,7 @@ void AutoCtrl(AutoCtrl_StateTypeDef *PID_Type)
 			auto_cq = (int16_t)(out_KCP - (short)PID_Type->pidout);
 			for (uint8_t device_id = V_Prop_RF; device_id <= V_Prop_LF; device_id++)
 			{
-				Prop_Infor.Auto_H_CQ[device_id] = Static_CQ - (auto_cq - CQ_MID);
+				Prop_Ctrol.Auto_H_CQ[device_id] = Static_CQ - (auto_cq - RS485_CQ_MID);
 			}
 			break;
 		case Auto_Heading:

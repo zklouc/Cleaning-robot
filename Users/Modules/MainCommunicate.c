@@ -71,9 +71,9 @@ void ROV_ReceiveData(void *argument)
 						{
 							JoyStick[i] = ((uint16_t)frame0.data[i * 2 + 3] << 8) + frame0.data[i * 2 + 4];
 						}
-						/* 上浮下潜/横滚控制量 */
-						Prop_Infor.Vertical_Value = ((uint16_t)frame0.data[13] << 8) + frame0.data[14];
-
+						/* 上浮下潜控制量 */
+						Prop_Ctrol.Vertical_Value_DEC = frame0.data[13];
+						Prop_Ctrol.Vertical_Value_ADD = frame0.data[14];
 
 						/* -------------------- 自动控制设定值（字节32~39）------------- */
 						/* 定深（32-33）、定向（34-35）、定俯仰（36-37）、定横滚（38-39） */
@@ -177,7 +177,7 @@ void ROV_FeedbackData(void *argument)
 		feedback_data[21] = LED.CQ_Current[0];
 		
 		/* 姿态翻转 */
-		feedback_data[24] = Prop_Infor.Roll_Change;
+		feedback_data[24] = Prop_Ctrol.Roll_Change;
 		
 //		/* 垂向控制模式 */
 //		feedback_data[25] = Motor_Kind[Vertical].Enable_Flag;
@@ -189,13 +189,13 @@ void ROV_FeedbackData(void *argument)
 		for (uint8_t j=0;j<4;j++)
 		{
 			feedback_data[26+(j<<1)]		= (uint8_t)(CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_RPM);     
-			feedback_data[26+(j<<1)+1]	= (CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_RPM>>8);
+			feedback_data[27+(j<<1)]	= (CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_RPM>>8);
 		}
 		/*垂向推进器电压信息*/
 		for (uint8_t j=0;j<4;j++)
 		{
-			feedback_data[42+(j<<1)]		= (uint8_t)(CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_Voltage);     
-			feedback_data[42+(j<<1)+1]	= (CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_Voltage>>8);
+			feedback_data[42+(j<<1)]		= (CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_Voltage>>8);     
+			feedback_data[42+(j<<1)+1]	= (uint8_t)(CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_Voltage);
 		}
 		/*垂向推进器电流信息*/
 		for (uint8_t j=0;j<4;j++)

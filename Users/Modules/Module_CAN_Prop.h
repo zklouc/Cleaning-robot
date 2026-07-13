@@ -9,7 +9,7 @@
 *********************
 *********************
 ***(2)*********(6)***
-*********************
+*********************/
 
 /* CAN发送扩展帧起始地址 */
 #define				CAN_Prop_Tx_BaseID			 0x0501EF70
@@ -18,10 +18,10 @@
 #define				CAN_Prop_Rx_BaseID			 0x050170E0
 
 
-/* 水平&垂向推进器控制量:1000---1500---2000(ID:0--9) */
-#define 			CAN_CQ_MIN		1020
-#define 			CAN_CQ_MID		1500
-#define				CAN_CQ_MAX		1980
+/* 垂向推进器控制量 */
+#define 			CAN_CQ_MIN		-5000
+#define 			CAN_CQ_MID		0
+#define				CAN_CQ_MAX		5000
 
 
 /*推进器增量限幅*/
@@ -29,7 +29,8 @@
 #define Prop_Dec_Size  20 
 
 /*转化系数*/
-#define Convet_Factor(x,y)  ((float)((x-y)/250.0))
+#define Convet_Factor(x,y)  ((float)((x-y)/255.0))
+	
 /*转弯转化系数*/
 #define Convet1_Factor(x,y)  ((float)((x-y)/600.0))
 	
@@ -56,9 +57,8 @@ typedef struct
     uint8_t     Prop_life;            // 生命信号（循环发送）
 }CAN_Prop_CtrlTypeDef;
 
-#define CAN_PROP_MAX_ID  4
 
-extern CAN_Prop_CtrlTypeDef CAN_Prop[CAN_PROP_MAX_ID];
+extern CAN_Prop_CtrlTypeDef CAN_Prop[4];
 extern uint8_t Vertical_Prop_ID[4];
 
 void CAN_Config(void);

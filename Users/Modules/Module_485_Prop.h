@@ -7,7 +7,13 @@
 
 #define RS485_UART       huart5
 #define RS485_PROP_MAX_ID     4
-#define MOTOR_SPEED_MAX  1000  // 转速最大限幅
+#define MOTOR_SPEED_MAX  1200  // 转速最大限幅
+
+/* 垂向推进器控制量 */
+#define 			RS485_CQ_MIN		-1200
+#define 			RS485_CQ_MID		0
+#define				RS485_CQ_MAX		1200
+
 
 // ===================== 寄存器地址（手册标准地址） =====================
 // 可写寄存器

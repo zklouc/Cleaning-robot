@@ -5,7 +5,7 @@ static CAN_TxHeaderTypeDef	TxHeader;      //发送
 static CAN_RxHeaderTypeDef	RxHeader;      //接收
 
 
-CAN_Prop_CtrlTypeDef CAN_Prop[CAN_PROP_MAX_ID];
+CAN_Prop_CtrlTypeDef CAN_Prop[4];
 
 uint8_t Vertical_Prop_ID[4]   = {7, 6, 2, 1};
 
@@ -62,7 +62,7 @@ void CAN_Config(void)
 
   /*配置CAN发送句柄*/
   TxHeader.StdId = 0x321;
-  TxHeader.ExtId = 0x0501EF70;
+  TxHeader.ExtId = CAN_Prop_Tx_BaseID;
   TxHeader.RTR = CAN_RTR_DATA;
   TxHeader.IDE = CAN_ID_EXT;
   TxHeader.DLC = 8;
@@ -92,7 +92,7 @@ uint8_t Can_Prop_Send(CAN_HandleTypeDef *hcan, uint8_t *msg, uint8_t len, uint32
     TxHeader.IDE = CAN_ID_EXT;    //使用扩展帧
     TxHeader.RTR = CAN_RTR_DATA;  //数据帧
     TxHeader.DLC = len;        
-	//可不拷贝	
+	
     for(i = 0; i < len; i++)
     {
 			message[i]=msg[i];
@@ -100,7 +100,7 @@ uint8_t Can_Prop_Send(CAN_HandleTypeDef *hcan, uint8_t *msg, uint8_t len, uint32
     
 		while(HAL_CAN_GetTxMailboxesFreeLevel(hcan) == 0) 
 		{
-			if(++cnt >= 500)
+			if(++cnt > 200)
 			{
 				cnt = 0;
 				return 2;//超时
@@ -156,45 +156,39 @@ void CAN1_SendData(void *argument)
 	static TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
 	uint8_t tx_buf[8] = {0};
-	uint8_t dev_idx, dev_id;
+	uint8_t  dev_id;
 	uint32_t send_ext_id;
-
+  uint8_t res;
 	for(;;)
 	{
 		// 遍历4路推进器，和接收端 j=0~3 逻辑一致
-		for(dev_idx = 0; dev_idx < 4; dev_idx++)
+		for(uint8_t i = 0; i < 4; i++)
 		{
 			// 从映射表取出实际设备ID
-			dev_id = Vertical_Prop_ID[dev_idx];
-			// 发送ID 与 接收ID规则统一：BASE_ID + 设备ID
-			send_ext_id = CAN_Prop_Rx_BaseID + dev_id;
+			dev_id = Vertical_Prop_ID[i];
 
-//			// 互斥锁
-//			if(dev_idx == 0)
-//			{
-//				osMutexAcquire(Vertical_MutexHandle, osWaitForever);
-//			}
+			if (dev_id == 7) osMutexAcquire(Vertical_MutexHandle, osWaitForever);
+
 
 			/********** 从 CAN_Prop[dev_id] 结构体拆解数据到CAN发送缓冲区 **********/
-			tx_buf[0]  = (uint8_t)(CAN_Prop[dev_id].Prop_Tx_Ctl & 0xFF);
-			tx_buf[1]  = (uint8_t)(CAN_Prop[dev_id].Prop_Tx_Ctl >> 8);
-			tx_buf[2]  = CAN_Prop[dev_id].Prop_Tx_Config;
-			tx_buf[3]  = CAN_Prop[dev_id].Prop_Tx_Mode;
-			tx_buf[4]  = CAN_Prop[dev_id].Prop_Tx_Direction;
-			tx_buf[5]  = CAN_Prop[dev_id].Prop_Tx_Curren_Range;
-			tx_buf[6]  = CAN_Prop[dev_id].Prop_Tx_Start_Time;
-			tx_buf[7]  = CAN_Prop[dev_id].Prop_life;
+			tx_buf[0]  = CAN_Prop[i].Prop_Tx_Config;
+			tx_buf[1]  = CAN_Prop[i].Prop_Tx_Mode;
+			tx_buf[2]  = CAN_Prop[i].Prop_Tx_Direction;
+			tx_buf[3]  = (uint8_t)(CAN_Prop[i].Prop_Tx_Ctl & 0xFF);
+			tx_buf[4]  = (uint8_t)(CAN_Prop[i].Prop_Tx_Ctl >> 8);
+			tx_buf[5]  = CAN_Prop[i].Prop_Tx_Curren_Range;
+			tx_buf[6]  = CAN_Prop[i].Prop_Tx_Start_Time;
+			tx_buf[7]  = 0x00;
+			
+			/// 发送单帧
+			Prop_Ctrol.Manual_V_RES[i] = Can_Prop_Send(&hcan1, tx_buf, 8, dev_id + 0x0501EF70);
 
-			// 调用发送接口，DLC固定8字节
-			Can_Prop_Send(&hcan1, tx_buf, 8, send_ext_id);
-			osDelay(2);
-
-//			// 最后一路解锁
-//			if(dev_idx == 3)
-//			{
-//				osMutexRelease(Vertical_MutexHandle);
-//			}
+			// 帧间间隔：2ms，保证一帧发完再发下一帧，实现依次发送
+			vTaskDelay(pdMS_TO_TICKS(2));
+			
+			if (dev_id == 1) osMutexRelease(Vertical_MutexHandle);
 		}
+
 
 		// 固定30ms周期运行
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(30));
@@ -239,7 +233,7 @@ void CAN_Prop_Init(void)
 	uint8_t j= 0;
 	for(j=0;j<4;j++)
 	{
-		uint8_t i= Horizontal_Prop_ID[j];
+		uint8_t i= Vertical_Prop_ID[j];
 		CAN_Prop[i].Prop_Tx_Config = 0;
 		CAN_Prop[i].Prop_Tx_Mode = 0x01;
 		CAN_Prop[i].Prop_Tx_Direction = 0;
@@ -247,6 +241,8 @@ void CAN_Prop_Init(void)
 		CAN_Prop[i].Prop_Tx_Curren_Range = 0x00;
 		CAN_Prop[i].Prop_Tx_Start_Time = 0x00;
 		CAN_Prop[i].Prop_EXTID = CAN_Prop_Tx_BaseID + i;
+		
+		
 	}
 }
 
