@@ -255,6 +255,26 @@
           <WinNumber>1</WinNumber>
           <ItemText>Attitude_Data</ItemText>
         </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Prop_Infor</ItemText>
+        </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>CAN_Prop</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>send_ext_id</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>dev_id</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
