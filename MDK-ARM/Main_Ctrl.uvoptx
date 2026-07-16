@@ -163,97 +163,77 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Prop_Infor,0x0A</ItemText>
+          <ItemText>LED,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LED,0x0A</ItemText>
+          <ItemText>Focalize,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>PTZ,0x0A</ItemText>
+          <ItemText>BatteryCabin,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Brush_Target,0x0A</ItemText>
+          <ItemText>hAuto</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Focalize,0x0A</ItemText>
+          <ItemText>feedback_data,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Motor_Kind,0x0A</ItemText>
+          <ItemText>PRE</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>BatteryCabin,0x0A</ItemText>
+          <ItemText>hSHT30,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>hAuto</ItemText>
+          <ItemText>LED</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Motor_Device,0x0A</ItemText>
+          <ItemText>Attitude_Data</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>WaterData,0x0A</ItemText>
+          <ItemText>CAN_Prop</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>feedback_data,0x0A</ItemText>
+          <ItemText>Prop_Ctrol</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Attitude_H,0x0A</ItemText>
+          <ItemText>snap_buf</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Attitude_V,0x0A</ItemText>
+          <ItemText>RS485_Prop</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>PRE</ItemText>
+          <ItemText>temp_cq</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>hSHT30,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>17</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Track_Heading_Revise,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>18</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>LED</ItemText>
-        </Ww>
-        <Ww>
-          <count>19</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>frame0</ItemText>
-        </Ww>
-        <Ww>
-          <count>20</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Attitude_Data</ItemText>
+          <ItemText>offset</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -331,6 +311,16 @@
           <count>14</count>
           <WinNumber>2</WinNumber>
           <ItemText>Prop_Infor,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>15</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>CAN_Prop</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>snap_buf</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>

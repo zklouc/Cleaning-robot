@@ -7,7 +7,7 @@
 #define VERT_PROP_NUM   4
 #define HORIZ_PROP_NUM  4
 #define TOTAL_PROP_NUM  (VERT_PROP_NUM + HORIZ_PROP_NUM)
-
+#define KEY_MID         0x80   // 手柄中点 128
 typedef enum {
     V_IDX_0 = 0,
     V_IDX_1,
@@ -38,12 +38,13 @@ typedef struct
     uint16_t             Manual_V_CQ[VERT_PROP_NUM];   /* 手动垂向控制量 [逻辑索引] */
 	  uint16_t             Manual_V_DIR[VERT_PROP_NUM];
 	  uint8_t              Manual_V_RES[VERT_PROP_NUM];
-    uint16_t             Manual_H_CQ[HORIZ_PROP_NUM];   /* 手动水平控制量 [逻辑索引] */
+    int16_t             Manual_H_CQ[HORIZ_PROP_NUM];   /* 手动水平控制量 [逻辑索引] */
 		uint16_t             Manual_H_DIR[HORIZ_PROP_NUM];
 	  uint8_t              Manual_H_RES[HORIZ_PROP_NUM];
     uint16_t             Auto_V_CQ[VERT_PROP_NUM];      /* 自动垂向控制量 [逻辑索引] */
     uint16_t             Auto_H_CQ[HORIZ_PROP_NUM];     /* 自动水平控制量 [逻辑索引] */
-    uint16_t             Final_CQ[TOTAL_PROP_NUM];      /* 最终输出值 [逻辑索引] */
+    uint16_t             Final_V_CQ[VERT_PROP_NUM];      /* 最终输出值 [逻辑索引] */
+	  int16_t              Final_H_CQ[HORIZ_PROP_NUM];
 } Prop_Control_Data_TypeDef;
 
 extern Prop_Control_Data_TypeDef Prop_Ctrol;

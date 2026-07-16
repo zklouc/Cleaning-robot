@@ -111,19 +111,13 @@ const osThreadAttr_t Compass_Data_Task_attributes = {
   .priority = (osPriority_t) osPriorityRealtime3,
 };
 /* Definitions for RS485_Propel_Tx_Task */
-osThreadId_t RS485_Propel_Tx_TaskHandle;
-const osThreadAttr_t RS485_Propel_Tx_Task_attributes = {
-  .name = "RS485_Propel_Tx_Task",
+osThreadId_t RS485_Propel_TaskHandle;
+const osThreadAttr_t RS485_Propel_Task_attributes = {
+  .name = "RS485_Propel_Task",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityRealtime4,
 };
-/* Definitions for RS485_Propel_Rx_Task */
-osThreadId_t RS485_Propel_Rx_TaskHandle;
-const osThreadAttr_t RS485_Propel_Rx_Task_attributes = {
-  .name = "RS485_Propel_Rx_Task",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityRealtime4,
-};
+
 /* Definitions for Manual_V_Task */
 osThreadId_t Manual_V_TaskHandle;
 const osThreadAttr_t Manual_V_Task_attributes = {
@@ -189,7 +183,7 @@ void ControlCabin_GetData(void *argument);
 void PWM_Ctrl(void *argument);
 extern void Press_DataPro(void *argument);
 extern void Compass_GetData(void *argument);
-extern void RS485_Propel_Set(void *argument);
+extern void Prop_485_Task(void *argument);
 extern void RS485_Propel_Receive(void *argument);
 extern void Manual_V_Ctrl(void *argument);
 extern void Manual_H_Ctrl(void *argument);
@@ -264,17 +258,14 @@ void MX_FREERTOS_Init(void) {
   /* creation of Compass_Data_Task */
   Compass_Data_TaskHandle = osThreadNew(Compass_GetData, NULL, &Compass_Data_Task_attributes);
 
-//  /* creation of RS485_Propel_Tx_Task */
-//  RS485_Propel_Tx_TaskHandle = osThreadNew(RS485_Propel_Set, NULL, &RS485_Propel_Tx_Task_attributes);
-
-//  /* creation of RS485_Propel_Rx_Task */
-//  RS485_Propel_Rx_TaskHandle = osThreadNew(RS485_Propel_Receive, NULL, &RS485_Propel_Rx_Task_attributes);
+  /* creation of RS485_Propel_Tx_Task */
+  RS485_Propel_TaskHandle = osThreadNew(Prop_485_Task, NULL, &RS485_Propel_Task_attributes);
 
   /* creation of Manual_V_Task */
   Manual_V_TaskHandle = osThreadNew(Manual_V_Ctrl, NULL, &Manual_V_Task_attributes);
 
-///* creation of Manual_H_Task */
-//  Manual_H_TaskHandle = osThreadNew(Manual_H_Ctrl, NULL, &Manual_H_Task_attributes);
+  /* creation of Manual_H_Task */
+  Manual_H_TaskHandle = osThreadNew(Manual_H_Ctrl, NULL, &Manual_H_Task_attributes);
 
 //  /* creation of Auto_V_Task */
 //  Auto_V_TaskHandle = osThreadNew(Auto_V_Ctrl, NULL, &Auto_V_Task_attributes);
@@ -357,6 +348,7 @@ void Global_Init(void *argument)
 	
 	/* 推进器初始化 */
 	CAN_Prop_Init();
+	RS485_Prop_Init();
 	
 	/* 待机定时器初始化 */
 	osTimerStart(Timer_StandbyHandle, 3000);
@@ -443,7 +435,7 @@ void Standby_Callback(void *argument)
 		/* 摇杆控制量 */
 		for (uint8_t i = R_FB; i <= L_LR; i++)
 		{
-			JoyStick[i] = 1500;
+			JoyStick[i] = 0x80;
 		}
 		
 		/* 上浮下潜控制量 */
@@ -454,7 +446,6 @@ void Standby_Callback(void *argument)
 		{
 			LED.CQ_Current[i] = 0;
 		}
-		
 		Prop_Init();
 	}
 		

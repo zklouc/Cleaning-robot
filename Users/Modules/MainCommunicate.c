@@ -69,7 +69,14 @@ void ROV_ReceiveData(void *argument)
 						/* 摇杆控制量 */
 						for (uint8_t i = R_FB; i <= L_LR; i++)
 						{
-							JoyStick[i] = ((uint16_t)frame0.data[i * 2 + 3] << 8) + frame0.data[i * 2 + 4];
+							JoyStick[i] = ((uint16_t)frame0.data[i + 3] );
+						}
+												/* 灯亮度控制量 */
+						for (uint8_t i = 0; i < LED_Device_Num; i++)
+						{
+							   LED.dec_btn = frame0.data[9];  // 减键：按下为 1
+							   LED.inc_btn = frame0.data[10];  // 加键：按下为 1
+                 
 						}
 						/* 上浮下潜控制量 */
 						Prop_Ctrol.Vertical_Value_DEC = frame0.data[13];
@@ -89,13 +96,7 @@ void ROV_ReceiveData(void *argument)
 						hAuto[Auto_Roll].set_value    = (float)roll_set  / 10.0f;
 
 
-						/* 灯亮度控制量 */
-						for (uint8_t i = 0; i < LED_Device_Num; i++)
-						{
-							   LED.dec_btn = frame0.data[42];  // 减键：按下为 1
-							   LED.inc_btn = frame0.data[43];  // 加键：按下为 1
-                 
-						}
+
 						
 						/* -------------------- 复位通信看门狗 ------------------------ */
 						Comm_Flag = true;
@@ -188,19 +189,19 @@ void ROV_FeedbackData(void *argument)
 		/*垂向推进器转速信息*/
 		for (uint8_t j=0;j<4;j++)
 		{
-			feedback_data[26+(j<<1)]		= (uint8_t)(CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_RPM);     
-			feedback_data[27+(j<<1)]	= (CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_RPM>>8);
+			feedback_data[26+(j<<1)]		= (uint8_t)(CAN_Prop[j].Prop_Rx_RPM);     
+			feedback_data[27+(j<<1)]	= (CAN_Prop[j].Prop_Rx_RPM>>8);
 		}
 		/*垂向推进器电压信息*/
 		for (uint8_t j=0;j<4;j++)
 		{
-			feedback_data[42+(j<<1)]		= (CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_Voltage>>8);     
-			feedback_data[42+(j<<1)+1]	= (uint8_t)(CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_Voltage);
+			feedback_data[42+(j<<1)]		= (CAN_Prop[j].Prop_Rx_Voltage>>8);     
+			feedback_data[42+(j<<1)+1]	= (uint8_t)(CAN_Prop[j].Prop_Rx_Voltage);
 		}
 		/*垂向推进器电流信息*/
 		for (uint8_t j=0;j<4;j++)
 		{
-			feedback_data[58+(j<<1)]		= (uint8_t)(CAN_Prop[Vertical_Prop_ID[j]].Prop_Rx_Current);     
+			feedback_data[58+(j<<1)]		= (uint8_t)(CAN_Prop[j].Prop_Rx_Current);     
 		}
 		
 		/*编码器转速信息*/

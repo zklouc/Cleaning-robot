@@ -15,7 +15,8 @@ Prop_Control_Data_TypeDef Prop_Ctrol =
 		.Manual_H_DIR   = {0, 0, 0, 0},
     .Auto_V_CQ      = {CAN_CQ_MID, CAN_CQ_MID, CAN_CQ_MID, CAN_CQ_MID},
     .Auto_H_CQ      = {RS485_CQ_MID, RS485_CQ_MID, RS485_CQ_MID, RS485_CQ_MID},
-    .Final_CQ       = {0, 0, 0, 0,0, 0, 0, 0},
+    .Final_H_CQ       = {0, 0, 0, 0},
+		.Final_V_CQ       = {0, 0, 0, 0},
 };
 
 int16_t Turn_Conv_CQ(uint16_t cq)
@@ -26,12 +27,21 @@ int16_t Turn_Conv_CQ(uint16_t cq)
 
 
 //限幅
-uint16_t Clamp(uint16_t val, uint16_t min, uint16_t max)
+uint16_t Clamp_uint(uint16_t val, uint16_t min, uint16_t max)
 {
     if (val < min) return min;
     if (val > max) return max;
     return val;
 }
+
+int16_t Clamp_int(int16_t val, int16_t min, uint16_t max)
+{
+    if (val < min) return min;
+    if (val > max) return max;
+    return val;
+}
+
+
 
 #include <string.h>
 
@@ -50,7 +60,8 @@ void Prop_Init(void)
     memset(Prop_Ctrol.Manual_H_DIR, 0, sizeof(Prop_Ctrol.Manual_H_DIR));
     memset(Prop_Ctrol.Auto_V_CQ,    0, sizeof(Prop_Ctrol.Auto_V_CQ));
     memset(Prop_Ctrol.Auto_H_CQ,    0, sizeof(Prop_Ctrol.Auto_H_CQ));
-    memset(Prop_Ctrol.Final_CQ,     0, sizeof(Prop_Ctrol.Final_CQ));
+	  memset(Prop_Ctrol.Final_V_CQ,     0, sizeof(Prop_Ctrol.Final_V_CQ));
+    memset(Prop_Ctrol.Final_H_CQ,     0, sizeof(Prop_Ctrol.Final_H_CQ));
 }
 
 
@@ -60,15 +71,15 @@ void Prop_Apply_Vertical(void)
 {
     for (uint8_t i = 0; i < 4; i++)
     {
-//        uint16_t cq;
-////        if (Prop_Ctrol.Deepth_Flag)
-////            cq = Prop_Ctrol.Auto_V_CQ[i];
-////        else
-//        cq = Prop_Ctrol.Manual_V_CQ[i];
+        uint16_t cq;
+        if (Prop_Ctrol.Deepth_Flag)
+            cq = Prop_Ctrol.Auto_V_CQ[i];
+        else
+            cq = Prop_Ctrol.Manual_V_CQ[i];
 
-//        cq = Clamp(cq, CAN_CQ_MIN, CAN_CQ_MAX);
-//        Prop_Ctrol.Final_CQ[i] = cq;
-        CAN_Prop[i].Prop_Tx_Ctl = Prop_Ctrol.Manual_V_CQ[i];;
+        Prop_Ctrol.Final_V_CQ[i] = cq;
+			  CAN_Prop[i].Prop_Tx_Curren_Range = 0x64;
+        CAN_Prop[i].Prop_Tx_Ctl = cq;  //Prop_Ctrol.Manual_V_CQ[i];
 			  CAN_Prop[i].Prop_Tx_Direction = Prop_Ctrol.Manual_V_DIR[i];
     }
 }
@@ -82,11 +93,25 @@ void Prop_Apply_Horizontal(void)
             cq = Prop_Ctrol.Auto_H_CQ[i];
         else
             cq = Prop_Ctrol.Manual_H_CQ[i];
-
-        cq = Clamp(cq, RS485_CQ_MIN, RS485_CQ_MAX);
-        Prop_Ctrol.Final_CQ[i] = cq;
-        Motor_SetSpeed(i+1, (int16_t)(cq - RS485_CQ_MID));
+				
+        Prop_Ctrol.Final_H_CQ[i] = cq;
+				RS485_Prop[i].target_rpm = cq;
+//        Motor_SetSpeed(i+1, (int16_t)(cq - RS485_CQ_MID));
     }
+}
+
+float Cal_Offset(uint8_t Input_Value)
+{
+	uint8_t key_Value = Input_Value;
+	float   offset=0.0f; 
+	//读取手柄值 + 限幅 [2, 252]
+	if(key_Value > 252)
+            key_Value = 252;
+	else if(key_Value < 2)
+			key_Value = 2;
+	offset =(float)(key_Value - KEY_MID);
+	return offset;
+				
 }
 
 void Manual_V_Ctrl(void *argument)
@@ -98,68 +123,56 @@ void Manual_V_Ctrl(void *argument)
     float   offset=0.0f;
     float   temp_cq=0.0f;
     uint16_t new_cq=0;
-    const uint8_t KEY_MID = 0x80;    // 手柄中点 128
     
     for (;;)
     {
-        // 1. 读取手柄值 + 限幅 [2, 252]
-        key_Value = Prop_Ctrol.Vertical_Value_ADD;
-        if(key_Value > 252)
-            key_Value = 252;
-        else if(key_Value < 2)
-            key_Value = 2;
+        // 计算相对中点偏移：0x80 为 0，自动区分正负方向
+        offset = Cal_Offset(Prop_Ctrol.Vertical_Value_ADD);
 
-        // 2. 计算相对中点偏移：0x80 为 0，自动区分正负方向
-        offset = (float)(key_Value - KEY_MID);
-
-        // 3. 线性映射到推进器输出范围
-        // Convet_Factor 按你的原有换算系数保留，也可自行改写纯线性映射
+        // 线性映射到推进器输出范围
         temp_cq = CAN_CQ_MID + offset * Convet_Factor(CAN_CQ_MAX, CAN_CQ_MIN);
 				
-        if (temp_cq > 0.0f)
+        if (offset > 0.0f)
         {
             // 正数：方向配置 1 0 0 1
-            Prop_Ctrol.Manual_V_DIR[0] = 1;
-            Prop_Ctrol.Manual_V_DIR[1] = 0;
+            Prop_Ctrol.Manual_V_DIR[0] = 0;
+            Prop_Ctrol.Manual_V_DIR[1] = 1;
             Prop_Ctrol.Manual_V_DIR[2] = 0;
             Prop_Ctrol.Manual_V_DIR[3] = 1;
         }
-        else
+        else if(offset < 0.0f)
         {
             // 负数：可根据实际需求自定义反向方向，示例给 0 1 1 0
-            Prop_Ctrol.Manual_V_DIR[0] = 0;
-            Prop_Ctrol.Manual_V_DIR[1] = 1;
+            Prop_Ctrol.Manual_V_DIR[0] = 1;
+            Prop_Ctrol.Manual_V_DIR[1] = 0;
             Prop_Ctrol.Manual_V_DIR[2] = 1;
             Prop_Ctrol.Manual_V_DIR[3] = 0;
         }
-
+				
         // 转速取绝对值
         temp_cq = fabsf(temp_cq);
-        // ============================================================
-				
-				
         new_cq  = (uint16_t)temp_cq;
 
-        // 4. 缓启缓停：单步最大变化 ±10，防止突变
-        int16_t delta = new_cq - Prop_Ctrol.Manual_V_CQ[1];
-        if(delta > 20)
+        //缓启缓停，防止突变
+        int16_t delta = new_cq - Prop_Ctrol.Manual_V_CQ[1];//先使用一个推进器去升降
+        if(delta > 50)
         {
-            new_cq = Prop_Ctrol.Manual_V_CQ[1] + 20;
+            new_cq = Prop_Ctrol.Manual_V_CQ[1] + 50;
         }
-        else if(delta < -20)
+        else if(delta < -30)
         {
-            new_cq = Prop_Ctrol.Manual_V_CQ[1] - 20;
+            new_cq = Prop_Ctrol.Manual_V_CQ[1] - 30;
         }
-				new_cq= Clamp(new_cq, 0, 5000);
-        // 5. 4路垂直推进器统一赋值
+				new_cq= Clamp_uint(new_cq, 0, 5000);
+
+        //  互斥保护 + 执行推进器输出
+        osMutexAcquire(Vertical_MutexHandle, osWaitForever);
+				//  4路垂直推进器统一赋值
         for (uint8_t i = 0; i < 4; i++)
         {
-					  Prop_Ctrol.Manual_V_CQ[i]= new_cq;
-            
+					  Prop_Ctrol.Manual_V_CQ[i]= new_cq; 
         }
-
-        // 6. 互斥保护 + 执行推进器输出
-        osMutexAcquire(Vertical_MutexHandle, osWaitForever);
+				
         Prop_Apply_Vertical();
         osMutexRelease(Vertical_MutexHandle);
 
@@ -172,26 +185,32 @@ void Manual_H_Ctrl(void *argument)
 {
     static TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
-
+	  float   offset=0.0f;
+    float   temp_cq=0.0f;
     for (;;)
     {
-            int16_t fb_cq = (int16_t)(JoyStick[L_FB] - RS485_CQ_MID);
-            int16_t lr_cq = (int16_t)(JoyStick[L_LR] - RS485_CQ_MID);
-
-            for (uint8_t i = 0; i < HORIZ_PROP_NUM; i++)
-            {
-                int16_t cq = RS485_CQ_MID;
-
-                switch (i)
-                {
-                    case H_IDX_0: cq = RS485_CQ_MID + fb_cq + lr_cq; break;
-                    case H_IDX_1: cq = RS485_CQ_MID + fb_cq - lr_cq; break;
-                    case H_IDX_2: cq = RS485_CQ_MID - fb_cq + lr_cq; break;
-                    case H_IDX_3: cq = RS485_CQ_MID - fb_cq - lr_cq; break;
-                }
-
-                Prop_Ctrol.Manual_H_CQ[i] = (uint16_t)Clamp(cq, RS485_CQ_MIN, RS485_CQ_MAX);
-            }
+			  // 计算相对中点偏移：0x80 为 0，自动区分正负方向
+				offset = Cal_Offset(JoyStick[R_FB]);//摇杆波动偏移		
+				// 线性映射到推进器输出范围
+				temp_cq = RS485_CQ_MID + offset * Convet_Factor(RS485_CQ_MAX, RS485_CQ_MIN);
+			  int16_t FB_CQ = (int16_t)temp_cq;//前后控制
+			
+			  offset = Cal_Offset(JoyStick[L_LR]);
+			  temp_cq = RS485_CQ_MID + offset * Convet_Factor(RS485_CQ_MAX, RS485_CQ_MIN);
+			  int16_t LR_CQ = (int16_t)temp_cq;//左右控制
+			
+				for (uint8_t i = 0; i < HORIZ_PROP_NUM; i++)
+				{
+						int16_t cq = RS485_CQ_MID;
+						switch (i)
+						{
+								case H_IDX_0: cq = RS485_CQ_MID + FB_CQ + LR_CQ; break;
+								case H_IDX_1: cq = RS485_CQ_MID + FB_CQ - LR_CQ; break;
+								case H_IDX_2: cq = RS485_CQ_MID - FB_CQ + LR_CQ; break;
+								case H_IDX_3: cq = RS485_CQ_MID - FB_CQ - LR_CQ; break;
+						}
+						Prop_Ctrol.Manual_H_CQ[i] = Clamp_int(cq, RS485_CQ_MIN, RS485_CQ_MAX);
+				}
 
             osMutexAcquire(Horizontal_MutexHandle, osWaitForever);
             Prop_Apply_Horizontal();

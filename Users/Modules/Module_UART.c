@@ -2,7 +2,7 @@
 #include "Module_UART.h"
 /* 变量声明 ------------------------------------------------------------------*/
 bool RS485_Mode;
-uint16_t JoyStick[4] = {1500,1500,1500,1500};
+uint8_t JoyStick[4] = {0,0,0,0};
 UsartPort_TypeDef UsartPort[6] = 
 {
 	{ .huart = &huart1 },   	// 第 0 路：USART1---TTL---主通信

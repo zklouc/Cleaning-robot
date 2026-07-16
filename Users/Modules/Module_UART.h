@@ -43,7 +43,7 @@ typedef struct
 
 extern UsartPort_TypeDef UsartPort[6];
 extern bool RS485_Mode;
-extern uint16_t JoyStick[4];
+extern uint8_t JoyStick[4];
 
 
 void User_UART_Init(void);
